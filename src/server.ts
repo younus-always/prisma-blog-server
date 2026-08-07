@@ -2,7 +2,7 @@ import { Server } from "http";
 import { prisma } from "./lib/prisma";
 import app from "./app";
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 let server: Server;
 
 const main = async () => {
