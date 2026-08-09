@@ -1,0 +1,25 @@
+import express, { Application } from "express";
+import cors from "cors";
+import { postRoutes } from "./modules/post/post.router";
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "./lib/auth";
+
+const app: Application = express();
+app.all('/api/auth/{*any}', toNodeHandler(auth));
+
+app.use(express.json());
+app.use(cors());
+
+app.use("/posts", postRoutes);
+
+
+app.get("/", (req, res) => {
+      res.status(200).json({
+            status: true,
+            statusCode: 200,
+            message: "Prisma Blog App Server"
+      });
+});
+
+
+export default app;
