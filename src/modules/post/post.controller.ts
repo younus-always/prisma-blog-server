@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { PostService } from "./post.service";
 import { PostStatus } from "../../../generated/prisma/enums";
+import { paginationSortingHelper } from "../../helpers/paginationSortingHelper";
 
 const createPost = async (req: Request, res: Response) => {
       try {
@@ -29,10 +30,12 @@ const createPost = async (req: Request, res: Response) => {
 
 const getAllPost = async (req: Request, res: Response) => {
       try {
+            // searching
             const { search } = req.query;
             const searchString = typeof search === "string" ? search : undefined;
             const tags = req.query.tags ? (req.query.tags as string).split(",") : [];
-            // true or false
+
+            // filtering
             const isFeatured = req.query.isFeatured
                   ? req.query.isFeatured === "true"
                         ? true
@@ -40,11 +43,13 @@ const getAllPost = async (req: Request, res: Response) => {
                               ? false
                               : undefined
                   : undefined;
-
             const status = req.query.status as PostStatus | undefined;
             const userId = req.query.userId as string | undefined;
 
-            const result = await PostService.getAllPost({ search: searchString, tags, isFeatured, status ,userId});
+            // pagination & sorting
+            const { page, limit, skip, sortBy, sortOrder } = paginationSortingHelper(req.query);
+
+            const result = await PostService.getAllPost({ search: searchString, tags, isFeatured, status, userId, page, limit, skip, sortBy, sortOrder });
 
             res.status(200).json({
                   success: true,
@@ -60,7 +65,28 @@ const getAllPost = async (req: Request, res: Response) => {
       }
 };
 
+const getPostById = async (req: Request, res: Response) => {
+      try {
+            const postId = req.params.postId as string;
+            const result = await PostService.getPostById(postId);
+
+            res.status(200).json({
+                  success: true,
+                  statusCode: 200,
+                  message: "Post retrieved by ID successfully",
+                  data: result
+            });
+      } catch (err) {
+            res.status(500).json({
+                  error: "post creation failed",
+                  details: err
+            })
+      }
+};
+
+
 export const PostController = {
       createPost,
-      getAllPost
+      getAllPost,
+      getPostById,
 };
