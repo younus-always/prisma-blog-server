@@ -47,9 +47,9 @@ const getAllPost = async (req: Request, res: Response) => {
             const userId = req.query.userId as string | undefined;
 
             // pagination & sorting
-            const { limit, skip, sortBy, sortOrder } = paginationSortingHelper(req.query);
+            const { page, limit, skip, sortBy, sortOrder } = paginationSortingHelper(req.query);
 
-            const result = await PostService.getAllPost({ search: searchString, tags, isFeatured, status, userId, limit, skip, sortBy, sortOrder });
+            const result = await PostService.getAllPost({ search: searchString, tags, isFeatured, status, userId, page, limit, skip, sortBy, sortOrder });
 
             res.status(200).json({
                   success: true,
@@ -65,7 +65,28 @@ const getAllPost = async (req: Request, res: Response) => {
       }
 };
 
+const getPostById = async (req: Request, res: Response) => {
+      try {
+            const postId = req.params.postId as string;
+            const result = await PostService.getPostById(postId);
+
+            res.status(200).json({
+                  success: true,
+                  statusCode: 200,
+                  message: "Post retrieved by ID successfully",
+                  data: result
+            });
+      } catch (err) {
+            res.status(500).json({
+                  error: "post creation failed",
+                  details: err
+            })
+      }
+};
+
+
 export const PostController = {
       createPost,
-      getAllPost
+      getAllPost,
+      getPostById,
 };
