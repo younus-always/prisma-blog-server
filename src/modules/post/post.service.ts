@@ -95,7 +95,7 @@ const getAllPost = async ({ search, tags, isFeatured, status, userId, page, limi
       });
 
       return {
-            data: allPost,
+            allPost,
             pagination: {
                   total,
                   page,
