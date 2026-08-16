@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { PostService } from "./post.service";
 import { PostStatus } from "../../../generated/prisma/enums";
 import { paginationSortingHelper } from "../../helpers/paginationSortingHelper";
+import { UserRole } from "../../middlewares/auth";
 
 
 const createPost = async (req: Request, res: Response) => {
@@ -92,9 +93,56 @@ const getPostById = async (req: Request, res: Response) => {
       }
 };
 
+const getMyPosts = async (req: Request, res: Response) => {
+      try {
+            const authorId = req.user?.id as string;
+            console.log(req.user);
+            const result = await PostService.getMyPosts(authorId);
+            res.status(200).json({
+                  success: true,
+                  statusCode: 200,
+                  message: "Fetch my posts successfully",
+                  data: result
+            });
+      } catch (err) {
+            const errMessage = (err instanceof Error) ? err.message : "Fetch my posts failed!";
+            res.status(500).json({
+                  success: false,
+                  error: errMessage,
+                  details: err
+            })
+      }
+};
+
+const updatePost = async (req: Request, res: Response) => {
+      try {
+            const postId = req.params.postId as string;
+            const authorId = req.user?.id as string;
+            const isAdmin = req.user?.role === UserRole.ADMIN;
+
+            const result = await PostService.updatePost(postId, authorId, isAdmin, req.body);
+
+            res.status(200).json({
+                  success: true,
+                  statusCode: 200,
+                  message: "Post updated successfully",
+                  data: result
+            });
+      } catch (err) {
+            const errMessage = (err instanceof Error) ? err.message : "Post update failed!";
+            res.status(500).json({
+                  success: false,
+                  error: errMessage,
+                  details: err
+            })
+      }
+};
+
 
 export const PostController = {
       createPost,
       getAllPost,
       getPostById,
+      getMyPosts,
+      updatePost
 };
