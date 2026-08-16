@@ -55,7 +55,8 @@ const getAllPost = async (req: Request, res: Response) => {
                   success: true,
                   statusCode: 200,
                   message: "All post retrieved successfully",
-                  data: result
+                  metadata: result.pagination,
+                  data: result.allPost,
             });
       } catch (err) {
             res.status(500).json({
