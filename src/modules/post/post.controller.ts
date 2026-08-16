@@ -3,14 +3,15 @@ import { PostService } from "./post.service";
 import { PostStatus } from "../../../generated/prisma/enums";
 import { paginationSortingHelper } from "../../helpers/paginationSortingHelper";
 
+
 const createPost = async (req: Request, res: Response) => {
       try {
             const user = req.user;
 
             if (!user) {
                   return res.status(401).json({
-                        error: "Unauthorized"
-                  })
+                        error: "Unauthorized user"
+                  });
             };
 
             const result = await PostService.createPost(req.body, user.id);
@@ -21,9 +22,11 @@ const createPost = async (req: Request, res: Response) => {
                   data: result
             });
       } catch (err) {
+            const errMessage = (err instanceof Error) ? err.message : "Post creation failed!";
             res.status(500).json({
-                  error: "Post creation failed",
-                  details: err
+                  success: false,
+                  error: errMessage,
+                  errDetails: err
             })
       }
 };
@@ -54,14 +57,16 @@ const getAllPost = async (req: Request, res: Response) => {
             res.status(200).json({
                   success: true,
                   statusCode: 200,
-                  message: "All post retrieved successfully",
+                  message: "Fetch all post successfully",
                   metadata: result.pagination,
                   data: result.allPost,
             });
       } catch (err) {
+            const errMessage = (err instanceof Error) ? err.message : "Fetch posts failed!";
             res.status(500).json({
-                  error: "post creation failed",
-                  details: err
+                  success: false,
+                  error: errMessage,
+                  errDetails: err
             })
       }
 };
@@ -74,12 +79,14 @@ const getPostById = async (req: Request, res: Response) => {
             res.status(200).json({
                   success: true,
                   statusCode: 200,
-                  message: "Post retrieved by ID successfully",
+                  message: "Fetch post by id successfully",
                   data: result
             });
       } catch (err) {
+            const errMessage = (err instanceof Error) ? err.message : "Fetch post failed!";
             res.status(500).json({
-                  error: "post creation failed",
+                  success: false,
+                  error: errMessage,
                   details: err
             })
       }

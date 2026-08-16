@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { CommentService } from "./comment.service";
 
+
 const createComment = async (req: Request, res: Response) => {
       try {
             const user = req.user;
@@ -14,8 +15,10 @@ const createComment = async (req: Request, res: Response) => {
                   data: result
             })
       } catch (err) {
+            const errMessage = (err instanceof Error) ? err.message : "Comment creation failed!";
             res.status(500).json({
                   success: false,
+                  error: errMessage,
                   errDetails: err
             });
       }
@@ -33,8 +36,10 @@ const getCommentById = async (req: Request, res: Response) => {
                   data: result
             })
       } catch (err) {
+            const errMessage = (err instanceof Error) ? err.message : "Fetch user comment failed!";
             res.status(500).json({
                   success: false,
+                  error: errMessage,
                   errDetails: err
             });
       }
@@ -52,8 +57,10 @@ const getCommentsByAuthor = async (req: Request, res: Response) => {
                   data: result
             })
       } catch (err) {
+            const errMessage = (err instanceof Error) ? err.message : "Fetch author comment failed!";
             res.status(500).json({
                   success: false,
+                  error: errMessage,
                   errDetails: err
             });
       }
@@ -73,8 +80,10 @@ const deleteComment = async (req: Request, res: Response) => {
                   data: result
             })
       } catch (err) {
+            const errMessage = (err instanceof Error) ? err.message : "Comment delete failed!";
             res.status(500).json({
                   success: false,
+                  error: errMessage,
                   errDetails: err
             });
       }
@@ -94,8 +103,31 @@ const updateComment = async (req: Request, res: Response) => {
                   data: result
             })
       } catch (err) {
+            const errMessage = (err instanceof Error) ? err.message : "Comment update failed!";
             res.status(500).json({
                   success: false,
+                  error: errMessage,
+                  errDetails: err
+            });
+      }
+};
+
+const moderateComment = async (req: Request, res: Response) => {
+      try {
+            const commentId = req.params.commentId as string;
+            const result = await CommentService.moderateComment(commentId, req.body);
+
+            res.status(200).json({
+                  success: true,
+                  statusCode: 200,
+                  message: "Comment updated successfully",
+                  data: result
+            })
+      } catch (err) {
+            const errMessage = (err instanceof Error) ? err.message : "Comment update failed!";
+            res.status(500).json({
+                  success: false,
+                  error: errMessage,
                   errDetails: err
             });
       }
@@ -107,5 +139,6 @@ export const CommentController = {
       getCommentById,
       getCommentsByAuthor,
       deleteComment,
-      updateComment
+      updateComment,
+      moderateComment
 };
