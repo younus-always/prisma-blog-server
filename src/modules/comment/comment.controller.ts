@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { CommentService } from "./comment.service";
 
-const createComment = async (req: Request, res: Response) => {
+
+const createComment = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const user = req.user;
             req.body.userId = user?.id;
@@ -14,14 +15,11 @@ const createComment = async (req: Request, res: Response) => {
                   data: result
             })
       } catch (err) {
-            res.status(500).json({
-                  success: false,
-                  errDetails: err
-            });
+            next(err)
       }
 };
 
-const getCommentById = async (req: Request, res: Response) => {
+const getCommentById = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const commentId = req.params.commentId as string;
             const result = await CommentService.getCommentById(commentId);
@@ -33,14 +31,11 @@ const getCommentById = async (req: Request, res: Response) => {
                   data: result
             })
       } catch (err) {
-            res.status(500).json({
-                  success: false,
-                  errDetails: err
-            });
+            next(err)
       }
 };
 
-const getCommentsByAuthor = async (req: Request, res: Response) => {
+const getCommentsByAuthor = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const authorId = req.params.authorId as string;
             const result = await CommentService.getCommentsByAuthor(authorId);
@@ -52,14 +47,11 @@ const getCommentsByAuthor = async (req: Request, res: Response) => {
                   data: result
             })
       } catch (err) {
-            res.status(500).json({
-                  success: false,
-                  errDetails: err
-            });
+            next(err)
       }
 };
 
-const deleteComment = async (req: Request, res: Response) => {
+const deleteComment = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const user = req.user;
             const commentId = req.params.commentId as string;
@@ -73,14 +65,11 @@ const deleteComment = async (req: Request, res: Response) => {
                   data: result
             })
       } catch (err) {
-            res.status(500).json({
-                  success: false,
-                  errDetails: err
-            });
+            next(err)
       }
 };
 
-const updateComment = async (req: Request, res: Response) => {
+const updateComment = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const user = req.user;
             const commentId = req.params.commentId as string;
@@ -94,10 +83,23 @@ const updateComment = async (req: Request, res: Response) => {
                   data: result
             })
       } catch (err) {
-            res.status(500).json({
-                  success: false,
-                  errDetails: err
-            });
+            next(err)
+      }
+};
+
+const moderateComment = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+            const commentId = req.params.commentId as string;
+            const result = await CommentService.moderateComment(commentId, req.body);
+
+            res.status(200).json({
+                  success: true,
+                  statusCode: 200,
+                  message: "Comment updated successfully",
+                  data: result
+            })
+      } catch (err) {
+            next(err)
       }
 };
 
@@ -107,5 +109,6 @@ export const CommentController = {
       getCommentById,
       getCommentsByAuthor,
       deleteComment,
-      updateComment
+      updateComment,
+      moderateComment
 };

@@ -6,7 +6,27 @@ import auth, { UserRole } from "../../middlewares/auth";
 const router = Router();
 
 router.get("/", PostController.getAllPost);
-router.post("/", auth(UserRole.USER), PostController.createPost);
+router.get("/my-posts",
+      auth(UserRole.ADMIN, UserRole.USER),
+      PostController.getMyPosts
+);
+router.get("/stats",
+      auth(UserRole.USER),
+      PostController.getStats
+);
 router.get("/:postId", PostController.getPostById);
+router.post("/",
+      auth(UserRole.ADMIN, UserRole.USER),
+      PostController.createPost
+);
+router.patch("/:postId",
+      auth(UserRole.ADMIN, UserRole.USER),
+      PostController.updatePost
+);
+router.delete("/:postId",
+      auth(UserRole.ADMIN, UserRole.USER),
+      PostController.deletePost
+);
+
 
 export const postRoutes = router;
