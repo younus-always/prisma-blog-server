@@ -138,11 +138,57 @@ const updatePost = async (req: Request, res: Response) => {
       }
 };
 
+const deletePost = async (req: Request, res: Response) => {
+      try {
+            const postId = req.params.postId as string;
+            const authorId = req.user?.id as string;
+            const isAdmin = req.user?.role === UserRole.ADMIN;
+
+            const result = await PostService.deletePost(postId, authorId, isAdmin);
+
+            res.status(200).json({
+                  success: true,
+                  statusCode: 200,
+                  message: "Post deleted successfully",
+                  data: result
+            });
+      } catch (err) {
+            const errMessage = (err instanceof Error) ? err.message : "Post delete failed!";
+            res.status(500).json({
+                  success: false,
+                  error: errMessage,
+                  details: err
+            })
+      }
+};
+
+const getStats = async (req: Request, res: Response) => {
+      try {
+            const result = await PostService.getStats();
+
+            res.status(200).json({
+                  success: true,
+                  statusCode: 200,
+                  message: "Fetch statistics successfully",
+                  data: result
+            });
+      } catch (err) {
+            const errMessage = (err instanceof Error) ? err.message : "Fetch statistics failed!";
+            res.status(500).json({
+                  success: false,
+                  error: errMessage,
+                  details: err
+            })
+      }
+};
+
 
 export const PostController = {
       createPost,
       getAllPost,
       getPostById,
       getMyPosts,
-      updatePost
+      updatePost,
+      deletePost,
+      getStats
 };

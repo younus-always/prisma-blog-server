@@ -1,6 +1,7 @@
 import { CommentStatus, Post, PostStatus } from "../../../generated/prisma/client";
 import { PostWhereInput } from "../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma";
+import { UserRole } from "../../middlewares/auth";
 
 const createPost = async (data: Omit<Post, 'id' | 'userId' | 'createdAt' | 'updatedAt'>, userId: string) => {
       const result = await prisma.post.create({
@@ -210,10 +211,64 @@ const updatePost = async (postId: string, authorId: string, isAdmin: boolean, da
       });
 };
 
+const deletePost = async (postId: string, authorId: string, isAdmin: boolean) => {
+      const postData = await prisma.post.findUniqueOrThrow({
+            where: { id: postId },
+            select: {
+                  id: true,
+                  userId: true,
+            }
+      });
+
+      if (!isAdmin && (postData.userId !== authorId)) {
+            throw new Error("You are not owner/creator on this post!");
+      };
+
+      return await prisma.post.delete({
+            where: { id: postId }
+      });
+};
+
+const getStats = async () => {
+      return await prisma.$transaction(async (tx) => {
+            const [totalPosts, publishedPosts, draftPosts, archivedPosts, totalComments, approvedComments, rejectComments, totalUsers, adminCount, userCount, totalViews] = await Promise.all([
+                  await tx.post.count(),
+                  await tx.post.count({ where: { status: PostStatus.PUBLISHED } }),
+                  await tx.post.count({ where: { status: PostStatus.DRAFT } }),
+                  await tx.post.count({ where: { status: PostStatus.ARCHIVED } }),
+                  await tx.comment.count(),
+                  await tx.comment.count({ where: { status: CommentStatus.APPROVED } }),
+                  await tx.comment.count({ where: { status: CommentStatus.REJECT } }),
+                  await tx.user.count(),
+                  await tx.user.count({ where: { role: UserRole.ADMIN } }),
+                  await tx.user.count({ where: { role: UserRole.USER } }),
+                  await tx.post.aggregate({ _sum: { views: true } }),
+            ]);
+
+            return {
+                  totalPosts,
+                  publishedPosts,
+                  draftPosts,
+                  archivedPosts,
+                  totalComments,
+                  approvedComments,
+                  rejectComments,
+                  totalUsers,
+                  adminCount,
+                  userCount,
+                  totalViews: totalViews._sum.views
+            }
+      });
+
+};
+
+
 export const PostService = {
       createPost,
       getAllPost,
       getPostById,
       getMyPosts,
-      updatePost
+      updatePost,
+      deletePost,
+      getStats
 };

@@ -10,6 +10,10 @@ router.get("/my-posts",
       auth(UserRole.ADMIN, UserRole.USER),
       PostController.getMyPosts
 );
+router.get("/stats",
+      auth(UserRole.USER),
+      PostController.getStats
+);
 router.get("/:postId", PostController.getPostById);
 router.post("/",
       auth(UserRole.ADMIN, UserRole.USER),
@@ -18,6 +22,10 @@ router.post("/",
 router.patch("/:postId",
       auth(UserRole.ADMIN, UserRole.USER),
       PostController.updatePost
+);
+router.delete("/:postId",
+      auth(UserRole.ADMIN, UserRole.USER),
+      PostController.deletePost
 );
 
 
