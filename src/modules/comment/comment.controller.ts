@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { CommentService } from "./comment.service";
 
 
-const createComment = async (req: Request, res: Response) => {
+const createComment = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const user = req.user;
             req.body.userId = user?.id;
@@ -15,16 +15,11 @@ const createComment = async (req: Request, res: Response) => {
                   data: result
             })
       } catch (err) {
-            const errMessage = (err instanceof Error) ? err.message : "Comment creation failed!";
-            res.status(500).json({
-                  success: false,
-                  error: errMessage,
-                  errDetails: err
-            });
+            next(err)
       }
 };
 
-const getCommentById = async (req: Request, res: Response) => {
+const getCommentById = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const commentId = req.params.commentId as string;
             const result = await CommentService.getCommentById(commentId);
@@ -36,16 +31,11 @@ const getCommentById = async (req: Request, res: Response) => {
                   data: result
             })
       } catch (err) {
-            const errMessage = (err instanceof Error) ? err.message : "Fetch user comment failed!";
-            res.status(500).json({
-                  success: false,
-                  error: errMessage,
-                  errDetails: err
-            });
+            next(err)
       }
 };
 
-const getCommentsByAuthor = async (req: Request, res: Response) => {
+const getCommentsByAuthor = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const authorId = req.params.authorId as string;
             const result = await CommentService.getCommentsByAuthor(authorId);
@@ -57,16 +47,11 @@ const getCommentsByAuthor = async (req: Request, res: Response) => {
                   data: result
             })
       } catch (err) {
-            const errMessage = (err instanceof Error) ? err.message : "Fetch author comment failed!";
-            res.status(500).json({
-                  success: false,
-                  error: errMessage,
-                  errDetails: err
-            });
+            next(err)
       }
 };
 
-const deleteComment = async (req: Request, res: Response) => {
+const deleteComment = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const user = req.user;
             const commentId = req.params.commentId as string;
@@ -80,16 +65,11 @@ const deleteComment = async (req: Request, res: Response) => {
                   data: result
             })
       } catch (err) {
-            const errMessage = (err instanceof Error) ? err.message : "Comment delete failed!";
-            res.status(500).json({
-                  success: false,
-                  error: errMessage,
-                  errDetails: err
-            });
+            next(err)
       }
 };
 
-const updateComment = async (req: Request, res: Response) => {
+const updateComment = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const user = req.user;
             const commentId = req.params.commentId as string;
@@ -103,16 +83,11 @@ const updateComment = async (req: Request, res: Response) => {
                   data: result
             })
       } catch (err) {
-            const errMessage = (err instanceof Error) ? err.message : "Comment update failed!";
-            res.status(500).json({
-                  success: false,
-                  error: errMessage,
-                  errDetails: err
-            });
+            next(err)
       }
 };
 
-const moderateComment = async (req: Request, res: Response) => {
+const moderateComment = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const commentId = req.params.commentId as string;
             const result = await CommentService.moderateComment(commentId, req.body);
@@ -124,12 +99,7 @@ const moderateComment = async (req: Request, res: Response) => {
                   data: result
             })
       } catch (err) {
-            const errMessage = (err instanceof Error) ? err.message : "Comment update failed!";
-            res.status(500).json({
-                  success: false,
-                  error: errMessage,
-                  errDetails: err
-            });
+            next(err)
       }
 };
 

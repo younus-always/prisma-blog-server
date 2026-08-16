@@ -1,11 +1,11 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { PostService } from "./post.service";
 import { PostStatus } from "../../../generated/prisma/enums";
 import { paginationSortingHelper } from "../../helpers/paginationSortingHelper";
 import { UserRole } from "../../middlewares/auth";
 
 
-const createPost = async (req: Request, res: Response) => {
+const createPost = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const user = req.user;
 
@@ -23,16 +23,11 @@ const createPost = async (req: Request, res: Response) => {
                   data: result
             });
       } catch (err) {
-            const errMessage = (err instanceof Error) ? err.message : "Post creation failed!";
-            res.status(500).json({
-                  success: false,
-                  error: errMessage,
-                  errDetails: err
-            })
+            next(err);
       }
 };
 
-const getAllPost = async (req: Request, res: Response) => {
+const getAllPost = async (req: Request, res: Response, next: NextFunction) => {
       try {
             // searching
             const { search } = req.query;
@@ -63,16 +58,11 @@ const getAllPost = async (req: Request, res: Response) => {
                   data: result.allPost,
             });
       } catch (err) {
-            const errMessage = (err instanceof Error) ? err.message : "Fetch posts failed!";
-            res.status(500).json({
-                  success: false,
-                  error: errMessage,
-                  errDetails: err
-            })
+            next(err)
       }
 };
 
-const getPostById = async (req: Request, res: Response) => {
+const getPostById = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const postId = req.params.postId as string;
             const result = await PostService.getPostById(postId);
@@ -84,16 +74,11 @@ const getPostById = async (req: Request, res: Response) => {
                   data: result
             });
       } catch (err) {
-            const errMessage = (err instanceof Error) ? err.message : "Fetch post failed!";
-            res.status(500).json({
-                  success: false,
-                  error: errMessage,
-                  details: err
-            })
+            next(err)
       }
 };
 
-const getMyPosts = async (req: Request, res: Response) => {
+const getMyPosts = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const authorId = req.user?.id as string;
             console.log(req.user);
@@ -105,16 +90,11 @@ const getMyPosts = async (req: Request, res: Response) => {
                   data: result
             });
       } catch (err) {
-            const errMessage = (err instanceof Error) ? err.message : "Fetch my posts failed!";
-            res.status(500).json({
-                  success: false,
-                  error: errMessage,
-                  details: err
-            })
+            next(err)
       }
 };
 
-const updatePost = async (req: Request, res: Response) => {
+const updatePost = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const postId = req.params.postId as string;
             const authorId = req.user?.id as string;
@@ -129,16 +109,11 @@ const updatePost = async (req: Request, res: Response) => {
                   data: result
             });
       } catch (err) {
-            const errMessage = (err instanceof Error) ? err.message : "Post update failed!";
-            res.status(500).json({
-                  success: false,
-                  error: errMessage,
-                  details: err
-            })
+            next(err)
       }
 };
 
-const deletePost = async (req: Request, res: Response) => {
+const deletePost = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const postId = req.params.postId as string;
             const authorId = req.user?.id as string;
@@ -153,16 +128,11 @@ const deletePost = async (req: Request, res: Response) => {
                   data: result
             });
       } catch (err) {
-            const errMessage = (err instanceof Error) ? err.message : "Post delete failed!";
-            res.status(500).json({
-                  success: false,
-                  error: errMessage,
-                  details: err
-            })
+            next(err)
       }
 };
 
-const getStats = async (req: Request, res: Response) => {
+const getStats = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const result = await PostService.getStats();
 
@@ -173,12 +143,7 @@ const getStats = async (req: Request, res: Response) => {
                   data: result
             });
       } catch (err) {
-            const errMessage = (err instanceof Error) ? err.message : "Fetch statistics failed!";
-            res.status(500).json({
-                  success: false,
-                  error: errMessage,
-                  details: err
-            })
+            next(err)
       }
 };
 
