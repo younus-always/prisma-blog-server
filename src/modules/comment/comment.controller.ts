@@ -28,7 +28,7 @@ const getCommentById = async (req: Request, res: Response) => {
 
             res.status(200).json({
                   success: true,
-                  statusCode: 201,
+                  statusCode: 200,
                   message: "Comment fetch by Id successfully",
                   data: result
             })
@@ -47,8 +47,50 @@ const getCommentsByAuthor = async (req: Request, res: Response) => {
 
             res.status(200).json({
                   success: true,
-                  statusCode: 201,
+                  statusCode: 200,
                   message: "Fetch author comments successfully",
+                  data: result
+            })
+      } catch (err) {
+            res.status(500).json({
+                  success: false,
+                  errDetails: err
+            });
+      }
+};
+
+const deleteComment = async (req: Request, res: Response) => {
+      try {
+            const user = req.user;
+            const commentId = req.params.commentId as string;
+
+            const result = await CommentService.deleteComment(commentId, user?.id as string);
+
+            res.status(200).json({
+                  success: true,
+                  statusCode: 200,
+                  message: "Comment deleted successfully",
+                  data: result
+            })
+      } catch (err) {
+            res.status(500).json({
+                  success: false,
+                  errDetails: err
+            });
+      }
+};
+
+const updateComment = async (req: Request, res: Response) => {
+      try {
+            const user = req.user;
+            const commentId = req.params.commentId as string;
+
+            const result = await CommentService.updateComment(commentId, user?.id as string, req.body);
+
+            res.status(200).json({
+                  success: true,
+                  statusCode: 200,
+                  message: "Comment updated successfully",
                   data: result
             })
       } catch (err) {
@@ -64,4 +106,6 @@ export const CommentController = {
       createComment,
       getCommentById,
       getCommentsByAuthor,
+      deleteComment,
+      updateComment
 };

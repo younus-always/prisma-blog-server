@@ -10,5 +10,13 @@ router.post("/",
       auth(UserRole.ADMIN, UserRole.USER),
       CommentController.createComment
 );
+router.delete("/:commentId",
+      auth(UserRole.ADMIN, UserRole.USER),
+      CommentController.deleteComment
+);
+router.patch("/:commentId",
+      auth(UserRole.ADMIN, UserRole.USER),
+      CommentController.updateComment
+);
 
 export const commentRoutes = router
